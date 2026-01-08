@@ -1,4 +1,4 @@
-const Person = (name, number) => {
+const Person = ({name, number}) => {
     return (
         <div>
             {name} : {number}

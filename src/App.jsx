@@ -1,25 +1,36 @@
 import Filter from './components/Filter'
 import Form from './components/Form'
 import Person from './components/Person'
-import { useState } from 'react'
+import axios from 'axios'
+import { useState, useEffect } from 'react'
 
 
 const App = () => {
 
  
   // state responsible for rendering exisiting names & phone numbers onto the screen 
-  const [persons, setPersons] = useState([
-    { name: 'Arto Hellas', number: '040-123456', id: 1 },
-    { name: 'Ada Lovelace', number: '39-44-5323523', id: 2 },
-    { name: 'Dan Abramov', number: '12-43-234345', id: 3 },
-    { name: 'Mary Poppendieck', number: '39-23-6423122', id: 4 }
-  ])
+  const [persons, setPersons] = useState([])
 
   // state responsible for handling user input like name, number and filtering 
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filteredInput, setFilteredInput] = useState('')
 
+  // when the app component is rendered for the first time and useEffect function gets called, the app is going to fetch
+  // the data from the json server and store it in the response object, and then store the data received from the server 
+  // into the state using setPersons(response.data). this causes the component to render again this time with the 
+  // server data 
+  useEffect(() => {
+    console.log('effect fired')
+    axios
+       .get('http://localhost:3001/persons')
+       .then(response =>{
+          console.log('promise fulfilled')
+          setPersons(response.data)
+       })
+  }, [])
+
+  console.log('render', persons.length, 'persons')
 
   // event handler to add new users to the phonebook
   // check if the person already exists in the phonebook, if not create a new person object with the newName
