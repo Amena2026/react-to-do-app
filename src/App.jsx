@@ -1,7 +1,7 @@
 import Filter from './components/Filter'
 import Form from './components/Form'
 import Person from './components/Person'
-import axios from 'axios'
+import personService from './services/people'
 import { useState, useEffect } from 'react'
 
 
@@ -16,19 +16,13 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
   const [filteredInput, setFilteredInput] = useState('')
 
-  // when the app component is rendered for the first time and useEffect function gets called, the app is going to fetch
-  // the data from the json server and store it in the response object, and then store the data received from the server 
-  // into the state using setPersons(response.data). this causes the component to render again this time with the 
-  // server data 
-  useEffect(() => {
-    console.log('effect fired')
-    axios
-       .get('http://localhost:3001/persons')
-       .then(response =>{
-          console.log('promise fulfilled')
-          setPersons(response.data)
-       })
-  }, [])
+  useEffect(()=> {
+    personService
+      .getAll()
+      .then(initialPeople=> {
+        setPersons(initialPeople)
+      })
+  }, []) 
 
   console.log('render', persons.length, 'persons')
 
@@ -56,11 +50,15 @@ const App = () => {
       const newPerson = {
         name: newName,
         number: newNumber,
-        id: persons.length + 1
       }
-      setPersons(persons.concat(newPerson))
-      setNewName('') // clear the input field for new name
-      console.log(`${newName} is added to phonebook`)
+
+      personService
+        .create(newPerson) // make a post request to the json server with the newly created Json object 
+        .then(returnedPerson => {
+          setPersons(persons.concat(returnedPerson)) // update the person state with the new person info 
+          setNewName('')                            // clear the new name and number input fields
+          setNewNumber('')
+        })
     }  
   }
 
