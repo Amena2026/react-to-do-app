@@ -1,7 +1,7 @@
 import Filter from './components/Filter'
 import Form from './components/Form'
 import Person from './components/Person'
-import personService from './services/people'
+import personService from './services/people' // contains functions responsible for communicating with the backend server
 import { useState, useEffect } from 'react'
 
 
@@ -16,6 +16,7 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
   const [filteredInput, setFilteredInput] = useState('')
 
+  // fetches data from the json server and updates the SetPersons 
   useEffect(()=> {
     personService
       .getAll()
@@ -75,6 +76,21 @@ const App = () => {
     setFilteredInput(event.target.value)
   }
 
+  /* deleteIndividualUser function takes the person id as a paramter. it is going to delete the user on the json server 
+  with the url http://localhost/persons/id and then update the persons state to a copy of the array without the 
+  deleted user.
+  */
+  const deleteIndividualUser = (id) => {
+    console.log(`deleting user with id of ${id}...`) 
+
+    personService
+     .deleteUser(id)
+     .then(returnedUser => {
+       console.log(returnedUser)
+       setPersons(persons.filter(person => person.id !== returnedUser.id))
+     })
+  }
+
   // if filteredInput has text then show the filtered list
   // otherwise show all persons
   const personsToShow = filteredInput
@@ -103,6 +119,7 @@ const App = () => {
           key={person.id}
           name={person.name}
           number={person.number}
+          deleteUser={()=> deleteIndividualUser(person.id)}
          /> 
       ))}
     </div>
